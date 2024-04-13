@@ -1,0 +1,82 @@
+CREATE TABLE Students (
+    StudentID INT PRIMARY KEY,
+    FirstName VARCHAR(50),
+    LastName VARCHAR(50),
+    ClassID INT,
+    BirthDate DATE,
+    FOREIGN KEY (ClassID) REFERENCES Classes(ClassID)
+);
+
+CREATE TABLE Classes (
+    ClassID INT PRIMARY KEY,
+    ClassName VARCHAR(50),
+    TeacherID INT,
+    FOREIGN KEY (TeacherID) REFERENCES Teachers(TeacherID)
+);
+
+CREATE TABLE Teachers (
+    TeacherID INT PRIMARY KEY,
+    FirstName VARCHAR(50),
+    LastName VARCHAR(50),
+    Subject VARCHAR(50)
+);
+
+INSERT INTO Classes (ClassID, ClassName, TeacherID) VALUES
+(1, 'Mathematics', 1),
+(2, 'Science', 2),
+(3, 'History', 3),
+(4, 'English', 4),
+(5, 'Computer Science', 5);
+
+INSERT INTO Students (StudentID, FirstName, LastName, ClassID, BirthDate) VALUES
+(1, 'Alice', 'Smith', 1, '2005-05-19'),
+(2, 'Bob', 'Johnson', 2, '2004-04-02'),
+(3, 'Charlie', 'Brown', 3, '2003-12-20'),
+(4, 'David', 'Lee', 4, '2002-06-22'),
+(5, 'Emma', 'Davis', 5, '2001-02-02'),
+(6, 'Frank', 'Wilson', 1, '2000-11-06'),
+(7, 'Grace', 'Taylor', 2, '1999-01-13'),
+(8, 'Hannah', 'Martinez', 3, '1998-03-12'),
+(9, 'Isaac', 'Anderson', 4, '1997-10-27'),
+(10, 'Jack', 'Thomas', 5, '1996-09-18');
+
+INSERT INTO Teachers (TeacherID, FirstName, LastName, Subject) VALUES
+(1, 'John', 'Doe', 'Mathematics'),
+(2, 'Emily', 'Johnson', 'Science'),
+(3, 'Michael', 'Williams', 'History'),
+(4, 'Sarah', 'Brown', 'English'),
+(5, 'Andrew', 'Taylor', 'Computer Science');
+
+SELECT s.FirstName, s.LastName, c.ClassName, t.FirstName AS TeacherFirstName, t.LastName AS TeacherLastName
+FROM Students s
+JOIN Classes c ON s.ClassID = c.ClassID
+JOIN Teachers t ON c.TeacherID = t.TeacherID;
+
+SELECT * FROM Students WHERE YEAR(BirthDate) >= 2000;
+
+SELECT s.FirstName, s.LastName, c.ClassName, t.FirstName AS TeacherFirstName, t.LastName AS TeacherLastName
+FROM Students s
+JOIN Classes c ON s.ClassID = c.ClassID
+JOIN Teachers t ON c.TeacherID = t.TeacherID
+ORDER BY s.FirstName, s.LastName;
+
+UPDATE Students SET FirstName = 'John', LastName = 'Doe' WHERE StudentID = 3;
+
+DELETE FROM Students WHERE StudentID = 7;
+
+CREATE PROCEDURE GetStudentsByClassAndSubject(IN classIDParam INT, IN subjectParam VARCHAR(50))
+BEGIN
+    SELECT s.FirstName, s.LastName
+    FROM Students s
+    JOIN Classes c ON s.ClassID = c.ClassID
+    JOIN Teachers t ON c.TeacherID = t.TeacherID
+    WHERE c.ClassID = classIDParam AND t.Subject = subjectParam;
+END;
+
+DELIMITER;
+
+CREATE VIEW StudentsWithClassAndTeacher AS
+SELECT s.FirstName, s.LastName, c.ClassName, t.FirstName AS TeacherFirstName, t.LastName AS TeacherLastName
+FROM Students s
+JOIN Classes c ON s.ClassID = c.ClassID
+JOIN Teachers t ON c.TeacherID = t.TeacherID;
